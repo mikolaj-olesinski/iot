@@ -4,7 +4,6 @@
 #define VREF 5.0
 #define ADC_RESOLUTION 10
 
-#define 
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -22,8 +21,6 @@ void setup()
 
 void loop() {
   int adcValue = analogRead(POTENTIOMETER_PIN);
-  adcValue = min(max(0, value - 10), 1023);
-
   float voltage = (adcValue * VREF) / pow(2, ADC_RESOLUTION);
 
   lcd.clear();
