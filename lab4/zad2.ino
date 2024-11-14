@@ -6,7 +6,7 @@
 #define GREEN_BUTTON 4
 
 String color;
-int pwmValue;
+int brightnessValue;
 
 void setup() 
 {
@@ -17,7 +17,7 @@ void setup()
     Serial.begin(9600);
     while (!Serial) {
     }
-    Serial.println("Enter command: <color> <pwm_value>");
+    Serial.println("Enter command: <color> <brightness_value>");
 }
 
 bool isNumber(String str) 
@@ -27,7 +27,7 @@ bool isNumber(String str)
     return true;
 }
 
-bool checkCommand(String command, String &color, int &pwmValue) 
+bool checkCommand(String command, String &color, int &brightnessValue) 
 {
     if (command.length() == 0) return false;
     
@@ -39,48 +39,49 @@ bool checkCommand(String command, String &color, int &pwmValue)
     if (spaceIndex > 0) 
     {
         color = command.substring(0, spaceIndex);
-        String pwmStr = command.substring(spaceIndex + 1);
+        String brightnessStr = command.substring(spaceIndex + 1);
+        brightnessStr.trim();
         
-        if (!isNumber(pwmStr)) 
+        if (!isNumber(brightnessStr)) 
         {
-            Serial.println("Invalid PWM value. Must be a number.");
+            Serial.println("Invalid brightness value: " + brightnessStr + ". Must be a number.");
             return false;
         }
 
-        pwmValue = pwmStr.toInt();
-        if (pwmValue < 0 || pwmValue > 255)
+        brightnessValue = brightnessStr.toInt();
+        if (brightnessValue < 0 || brightnessValue > 255)
         {
-            Serial.println("Invalid PWM value. Must be between 0 and 255.");
+            Serial.println("Invalid brightness value. Must be between 0 and 255.");
             return false;
         }
         return true;
 
     } else 
     {
-        Serial.println("Enter command: <color> <pwm_value> Invalid command: " + command);
+        Serial.println("Enter command: <color> <brightness_value> Invalid command: " + command);
         return false;
     }
 }
 
-void setColor(const String &color, int &pwmValue) 
+void setColor(const String &color, int &brightnessValue) 
 {
-    if (color == "red") analogWrite(LED_RED, pwmValue);
-    else if (color == "green") analogWrite(LED_GREEN, pwmValue);
-    else if (color == "blue") analogWrite(LED_BLUE, pwmValue);
+    if (color == "red") analogWrite(LED_RED, brightnessValue);
+    else if (color == "green") analogWrite(LED_GREEN, brightnessValue);
+    else if (color == "blue") analogWrite(LED_BLUE, brightnessValue);
     else 
     {
         Serial.println("Unknown color.");
         return;
     }
-    Serial.println("Setting " + color + " to " + String(pwmValue) + "...");
+    Serial.println("Setting " + color + " to " + String(brightnessValue) + "...");
 }
 
 void loop() 
 {
     String command = Serial.readStringUntil('\n');
 
-    if (checkCommand(command, color, pwmValue)) 
+    if (checkCommand(command, color, brightnessValue)) 
     {    
-        setColor(color, pwmValue);
+        setColor(color, brightnessValue);
     }
 }
