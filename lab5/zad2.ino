@@ -42,7 +42,6 @@ bool isButtonPressed(Button &button)
 
 void displayResult(int value, int selectedOption)
 {
-
     lcd.setCursor(0, 0);
     lcd.print("Selected: ");
     lcd.print(selectedOption == 0 ? "Red" : (selectedOption == 1 ? "Green" : "Blue"));
@@ -51,39 +50,37 @@ void displayResult(int value, int selectedOption)
     sprintf(buffer, "Intensity: %3d", value);
     lcd.setCursor(0, 1);
     lcd.print(buffer);
-
 }
 
 void showMenu(int selectedOption) 
 {
-  lcd.clear();
-  switch (selectedOption) 
-  {
-    case 0:
-      lcd.setCursor(0, 0);
-      lcd.print(">Red LED");
-      lcd.setCursor(1, 1);
-      lcd.print("Green LED");
-      break;
-    case 1:
-      lcd.setCursor(0, 0);
-      lcd.print("Red LED");
-      lcd.setCursor(1, 1);
-      lcd.print(">Green LED");
-      break;
-    case 2:
-      lcd.setCursor(0, 0);
-      lcd.print("Green LED");
-      lcd.setCursor(1, 1);
-      lcd.print(">Blue LED");
-      break;
-    default:
-      lcd.setCursor(0, 0);
-      lcd.print(">Blue LED");
-      break;
-  }
+    lcd.clear();
+    switch (selectedOption) 
+    {
+        case 0:
+            lcd.setCursor(0, 0);
+            lcd.print(">Red LED");
+            lcd.setCursor(1, 1);
+            lcd.print("Green LED");
+            break;
+        case 1:
+            lcd.setCursor(0, 0);
+            lcd.print("Red LED");
+            lcd.setCursor(1, 1);
+            lcd.print(">Green LED");
+            break;
+        case 2:
+            lcd.setCursor(0, 0);
+            lcd.print("Green LED");
+            lcd.setCursor(1, 1);
+            lcd.print(">Blue LED");
+            break;
+        default:
+            lcd.setCursor(0, 0);
+            lcd.print(">Blue LED");
+            break;
+    }
 }
-
 
 void setup() 
 {
@@ -109,7 +106,6 @@ void setup()
     PCMSK1 |= (1 << PCINT10);
 }
 
-
 int getLedPin(int option)
 {
     if (option == 0) return LED_RED;
@@ -117,22 +113,26 @@ int getLedPin(int option)
     else return LED_BLUE;
 }
 
+struct EncoderState 
+{
+    volatile int encoder1 = HIGH;
+    volatile int encoder2 = HIGH;
+    volatile unsigned long encoderTime = 0UL;
+    int selectedOption = 0;
+    int value = 0;
+    int previousEncoderA = LOW;
+    unsigned long lastEncoderTime = 0UL;
+};
+
+EncoderState es;
 volatile bool isInMenuMode = true;
-volatile int encoder1 = HIGH;
-volatile int encoder2 = HIGH;
-volatile unsigned long encoderTime = 0UL;
 
 ISR(PCINT1_vect)
 {
-    encoder1 = digitalRead(ENCODER1);
-    encoder2 = digitalRead(ENCODER2);
-    encoderTime = millis();
+    es.encoder1 = digitalRead(ENCODER1);
+    es.encoder2 = digitalRead(ENCODER2);
+    es.encoderTime = millis();
 }
-
-int selectedOption = 0;
-int encoderValue = 0;
-int previousEncoderA = LOW;
-unsigned long lastEncoderTime = 0UL;
 
 void loop() 
 {
@@ -142,9 +142,9 @@ void loop()
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) 
     {
-        en1 = encoder1;
-        en2 = encoder2;
-        timestamp = encoderTime;
+        en1 = es.encoder1;
+        en2 = es.encoder2;
+        timestamp = es.encoderTime;
     }
 
     if (isInMenuMode) handleMenuMode(en1, en2, timestamp);
@@ -155,40 +155,41 @@ void loop()
 
 void handleMenuMode(int en1, int en2, unsigned long timestamp) 
 {
-    if (en1 == LOW && timestamp > lastEncoderTime + DEBOUNCE_PERIOD) {
-        if (en2 == HIGH && encoderValue < 3) encoderValue++;
-        else if (en2 == LOW && encoderValue > 0) encoderValue--;
+    if (en1 == LOW && timestamp > es.lastEncoderTime + DEBOUNCE_PERIOD)
+    {
+        if (en2 == HIGH && es.value < 3) es.value++;
+        else if (en2 == LOW && es.value > 0) es.value--;
 
-        lastEncoderTime = timestamp;
-        showMenu(encoderValue);
+        es.lastEncoderTime = timestamp;
+        showMenu(es.value);
     }
-    previousEncoderA = en1;
+    es.previousEncoderA = en1;
 }
 
 void handleIntensityMode(int en1, int en2, unsigned long timestamp) 
 {
-    if (en1 == LOW && timestamp > lastEncoderTime + DEBOUNCE_PERIOD) 
+    if (en1 == LOW && timestamp > es.lastEncoderTime + DEBOUNCE_PERIOD) 
     {
-        if (en2 == HIGH && encoderValue < 255) encoderValue += 15;
-        else if (en2 == LOW && encoderValue > 0) encoderValue -= 15;
+        if (en2 == HIGH && es.value < 255) es.value += 15;
+        else if (en2 == LOW && es.value > 0) es.value -= 15;
         
-        lastEncoderTime = timestamp;
-        analogWrite(getLedPin(selectedOption), encoderValue);
-        displayResult(encoderValue, selectedOption);
+        es.lastEncoderTime = timestamp;
+        analogWrite(getLedPin(es.selectedOption), es.value);
+        displayResult(es.value, es.selectedOption);
     }
-    previousEncoderA = en1;
+    es.previousEncoderA = en1;
 }
 
 void toggleMenuMode() 
 {
     isInMenuMode = !isInMenuMode;
     lcd.clear();
-    encoderValue = 0;
+    es.value = 0;
 
-    if (isInMenuMode) showMenu(selectedOption);
+    if (isInMenuMode) showMenu(es.selectedOption);
     else 
     {
-        selectedOption = encoderValue;
-        displayResult(encoderValue, selectedOption);
+        es.selectedOption = es.value;
+        displayResult(es.value, es.selectedOption);
     }
 }
