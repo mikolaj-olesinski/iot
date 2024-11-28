@@ -4,6 +4,8 @@
 #define VREF 5.0
 #define ADC_RESOLUTION 10
 
+int adcPreviousValue = 0;
+
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -19,10 +21,8 @@ void setup()
   pinMode(POTENTIOMETER_PIN, INPUT);
 }
 
-void loop() {
-  int adcValue = analogRead(POTENTIOMETER_PIN);
-  float voltage = (adcValue * VREF) / pow(2, ADC_RESOLUTION);
-
+void print_adc_value(int adcValue, float voltage)
+{
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("ADC: ");
@@ -42,6 +42,20 @@ void loop() {
     lcd.setCursor(10, 0);
     lcd.print("Max");
   }
+}
 
-  delay(500);
+void loop() 
+{
+  int adcValue = analogRead(POTENTIOMETER_PIN);
+
+  float voltage = (adcValue * VREF) / pow(2, ADC_RESOLUTION);
+
+
+  if (adcValue < adcPreviousValue - 10 || adcValue > adcPreviousValue + 10)
+  {
+    print_adc_value(adcValue, voltage);
+    adcPreviousValue = adcValue;
+  }
+
+  delay(300);
 }

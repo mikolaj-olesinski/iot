@@ -11,7 +11,7 @@ void loop()
 {
   int adcValue = analogRead(POTENTIOMETER_PIN);
 
-  Serial.println("ADC: " + String(adcValue));
+  Serial.println("ADC:\t" + String(adcValue));
 
   delay(100); 
 }

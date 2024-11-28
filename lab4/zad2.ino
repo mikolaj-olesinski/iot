@@ -2,9 +2,6 @@
 #define LED_GREEN 5
 #define LED_BLUE 3
 
-#define RED_BUTTON 2
-#define GREEN_BUTTON 4
-
 String color;
 int brightnessValue;
 
