@@ -117,10 +117,9 @@ struct EncoderState
 {
     volatile int encoder1 = HIGH;
     volatile int encoder2 = HIGH;
-    volatile unsigned long encoderTime = 0UL;
+    volatile unsigned long encoderTimestamp = 0UL;
     int selectedOption = 0;
-    int value = 0;
-    int previousEncoderA = LOW;
+    int values[3] = {0, 0, 0}; 
     unsigned long lastEncoderTime = 0UL;
 };
 
@@ -131,7 +130,7 @@ ISR(PCINT1_vect)
 {
     es.encoder1 = digitalRead(ENCODER1);
     es.encoder2 = digitalRead(ENCODER2);
-    es.encoderTime = millis();
+    es.encoderTimestamp = millis();
 }
 
 void loop() 
@@ -144,7 +143,7 @@ void loop()
     {
         en1 = es.encoder1;
         en2 = es.encoder2;
-        timestamp = es.encoderTime;
+        timestamp = es.encoderTimestamp;
     }
 
     if (isInMenuMode) handleMenuMode(en1, en2, timestamp);
@@ -157,39 +156,37 @@ void handleMenuMode(int en1, int en2, unsigned long timestamp)
 {
     if (en1 == LOW && timestamp > es.lastEncoderTime + DEBOUNCE_PERIOD)
     {
-        if (en2 == HIGH && es.value < 3) es.value++;
-        else if (en2 == LOW && es.value > 0) es.value--;
+        if (en2 == HIGH && es.selectedOption < 2) es.selectedOption++;
+        else if (en2 == LOW && es.selectedOption > 0) es.selectedOption--;
 
         es.lastEncoderTime = timestamp;
-        showMenu(es.value);
+        showMenu(es.selectedOption);
     }
-    es.previousEncoderA = en1;
 }
 
 void handleIntensityMode(int en1, int en2, unsigned long timestamp) 
 {
     if (en1 == LOW && timestamp > es.lastEncoderTime + DEBOUNCE_PERIOD) 
     {
-        if (en2 == HIGH && es.value < 255) es.value += 15;
-        else if (en2 == LOW && es.value > 0) es.value -= 15;
+        if (en2 == HIGH && es.values[es.selectedOption] < 255) es.values[es.selectedOption] += 15;
+        else if (en2 == LOW && es.values[es.selectedOption] > 0) es.values[es.selectedOption] -= 15;
         
         es.lastEncoderTime = timestamp;
-        analogWrite(getLedPin(es.selectedOption), es.value);
-        displayResult(es.value, es.selectedOption);
+        analogWrite(getLedPin(es.selectedOption), es.values[es.selectedOption]);
+        displayResult(es.values[es.selectedOption], es.selectedOption);
     }
-    es.previousEncoderA = en1;
 }
 
 void toggleMenuMode() 
 {
     isInMenuMode = !isInMenuMode;
     lcd.clear();
-    es.value = 0;
-
-    if (isInMenuMode) showMenu(es.selectedOption);
-    else 
+    
+    if (isInMenuMode) 
     {
-        es.selectedOption = es.value;
-        displayResult(es.value, es.selectedOption);
+        showMenu(es.selectedOption);
+    } 
+    else {
+        displayResult(es.values[es.selectedOption], es.selectedOption);
     }
 }

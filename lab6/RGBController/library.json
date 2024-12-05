@@ -1,0 +1,22 @@
+{
+    "name": "RGBController",
+    "keywords": "rgb, led, controller",
+    "description": "Library for controlling RGB LEDs in Arduino projects",
+    "repository": {
+      "type": "git",
+      "url": "https://example.com/RGBController.git"
+    },
+    "authors": [
+      {
+        "name": "Mikolaj Olesinski",
+        "email": "272702@student.pwr.edu.pl",
+        "url": "http://your.website.example.com",
+        "maintainer": true
+      }
+    ],
+    "version": "1.0.0",
+    "homepage": "https://example.com/RGBController",
+    "frameworks": "arduino",
+    "platforms": "*"
+  }
+  

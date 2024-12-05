@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map For RGBController
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+RGBController KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+init KEYWORD2
+setColor KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+RED LITERAL1
+GREEN LITERAL1
+BLUE LITERAL1
+YELLOW LITERAL1
+CYAN LITERAL1
+MAGENTA LITERAL1
+WHITE LITERAL1
+BLACK LITERAL1
