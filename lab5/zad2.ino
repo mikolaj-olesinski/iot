@@ -23,7 +23,7 @@ struct Button
     unsigned long lastChangeTime;
 };
 
-Button redButton = {RED_BUTTON, HIGH, HIGH, 0UL};
+Button greenButton = {RED_BUTTON, HIGH, HIGH, 0UL};
 
 bool isButtonPressed(Button &button)
 {
@@ -149,7 +149,7 @@ void loop()
     if (isInMenuMode) handleMenuMode(en1, en2, timestamp);
     else handleIntensityMode(en1, en2, timestamp);
 
-    if (isButtonPressed(redButton)) toggleMenuMode();
+    if (isButtonPressed(greenButton)) toggleMenuMode();
 }
 
 void handleMenuMode(int en1, int en2, unsigned long timestamp) 

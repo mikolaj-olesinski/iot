@@ -16,7 +16,7 @@ struct Button
     unsigned long lastChangeTime;
 };
 
-Button redButton = {RED_BUTTON, HIGH, HIGH, 0UL};
+Button greenButton = {RED_BUTTON, HIGH, HIGH, 0UL};
 Button greenButton = {GREEN_BUTTON, HIGH, HIGH, 0UL};
 
 void initRGB() 
@@ -54,7 +54,7 @@ void setup()
 
 void loop() 
 {
-    if (isButtonPressed(redButton) || isButtonPressed(greenButton)) 
+    if (isButtonPressed(greenButton) || isButtonPressed(greenButton)) 
     {
         digitalWrite(led[led_index], LOW);
         led_index = ++led_index % 3;

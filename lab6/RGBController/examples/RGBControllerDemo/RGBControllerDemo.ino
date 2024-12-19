@@ -1,8 +1,8 @@
 #include "RGBController.h"
 
-#define PIN_RED 9
-#define PIN_GREEN 10
-#define PIN_BLUE 11
+#define PIN_RED 6
+#define PIN_GREEN 5
+#define PIN_BLUE 3
 
 RGBController rgb;
 
