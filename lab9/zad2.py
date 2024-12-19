@@ -129,7 +129,6 @@ if __name__ == "__main__":
         print("Program terminated.")
 
     finally:
-        # Cleanup GPIO and reset LEDs
         GPIO.cleanup()
         pixels.fill((0, 0, 0))
         pixels.show()
