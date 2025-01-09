@@ -44,7 +44,6 @@ PARAMETERS = {
 def read_ds18b20():
     sensor = w1thermsensor.W1ThermSensor()
     temp = sensor.get_temperature()
-    print(f"\nDS18B20 Temp: {temp} °C")
     return temp
 
 def configure_bme280():
