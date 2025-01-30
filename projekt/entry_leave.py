@@ -4,10 +4,12 @@
 import datetime
 import time
 from connect_to_db import connect_to_database
+from parking_display import ParkingDisplay
 
 class ParkingSystem:
     def __init__(self):
         # self.reader = MFRC522()
+        self.display = ParkingDisplay()
         self.price_per_hour = 10.00
 
     def connect_db(self):

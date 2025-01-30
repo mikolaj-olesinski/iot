@@ -88,3 +88,15 @@ class CompanyDisplay:
         for i, line in enumerate(lines[:2]):  # Pokaż maksymalnie 2 linie błędu
             self.draw.text((10, 25 + i*20), line, font=self.font_small, fill="BLACK")
         self.disp.ShowImage(self.image, 0, 0)
+
+    def show_edit_mode(self, current_hours):
+        lines = [
+            "EDITING HOURS",
+            f"Current: {current_hours}h",
+            "Press to save"
+        ]
+        self.display_message(lines)
+    
+    def show_confirmation(self, message):
+        lines = [message, "Changes saved!"]
+        self.display_message(lines)
