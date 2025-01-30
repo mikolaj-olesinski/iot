@@ -100,3 +100,10 @@ class CompanyDisplay:
     def show_confirmation(self, message):
         lines = [message, "Changes saved!"]
         self.display_message(lines)
+
+    def display_message(self, lines):
+        self.clear_display()
+        for i, line in enumerate(lines):
+            y_position = i * 20
+            self.draw.text((10, y_position), line, font=self.font_small, fill="BLACK")
+        self.disp.ShowImage(self.image, 0, 0)
