@@ -135,28 +135,29 @@ class CompanyCheckInSystem:
         try:
             print("Company check-in system ready. Please scan card.")
             while True:
-                self.display.show_waiting_screen(self.company_id)
-                status, TagType = self.reader.MFRC522_Request(self.reader.PICC_REQIDL)
-                if status == self.reader.MI_OK:
-                    status, uid = self.reader.MFRC522_Anticoll()
+                if not self.editing_mode:
+                    self.display.show_waiting_screen(self.company_id)
+                    status, TagType = self.reader.MFRC522_Request(self.reader.PICC_REQIDL)
                     if status == self.reader.MI_OK:
-                        card_id = "".join([str(x) for x in uid])
-                        buzz()
-                        try:
-                            with self.connect_db() as conn:
-                                check_in_status = self.process_check_in(conn, card_id)
-                                
-                                if check_in_status == "NO_ACTIVE_SESSION":
-                                    self.handle_no_active_session(card_id)
-                                elif check_in_status == "ALREADY_CHECKED_IN":
-                                    self.handle_already_checked_in(card_id)
-                                elif check_in_status == "CHECK_IN_SUCCESS":
-                                    self.handle_check_in_success(card_id)
-                                else:
-                                    self.handle_error(card_id, check_in_status)
+                        status, uid = self.reader.MFRC522_Anticoll()
+                        if status == self.reader.MI_OK:
+                            card_id = "".join([str(x) for x in uid])
+                            buzz()
+                            try:
+                                with self.connect_db() as conn:
+                                    check_in_status = self.process_check_in(conn, card_id)
+                                    
+                                    if check_in_status == "NO_ACTIVE_SESSION":
+                                        self.handle_no_active_session(card_id)
+                                    elif check_in_status == "ALREADY_CHECKED_IN":
+                                        self.handle_already_checked_in(card_id)
+                                    elif check_in_status == "CHECK_IN_SUCCESS":
+                                        self.handle_check_in_success(card_id)
+                                    else:
+                                        self.handle_error(card_id, check_in_status)
 
-                        except Exception as e:
-                            self.handle_error(card_id, e)
+                            except Exception as e:
+                                self.handle_error(card_id, e)
 
         except KeyboardInterrupt:
             print("Program terminated.")
