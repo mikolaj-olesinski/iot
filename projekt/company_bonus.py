@@ -47,20 +47,31 @@ class CompanyCheckInSystem:
 
     def handle_no_active_session(self, card_id):
         print(f"Vehicle {card_id} has no active parking session.")
+        self.display.show_no_active_session(card_id)
+        time.sleep(2)
 
     def handle_already_checked_in(self, card_id):
         print(f"Vehicle {card_id} is already checked in at company {self.company_id}.")
+        self.display.show_already_checked_in(self.company_id)
+        time.sleep(2)
 
     def handle_check_in_success(self, card_id):
         print(f"Vehicle {card_id} successfully checked in at company {self.company_id}.")
+        self.display.show_check_in_success(self.company_id)
+        time.sleep(2)
 
     def handle_error(self, card_id, error):
-        print(f"Error processing card ID {card_id}: {error}")
+        error_msg = f"Error processing card ID {card_id}: {error}"
+        print(error_msg)
+        self.display.show_error(str(error))
+        time.sleep(2)
+
 
     def run(self):
         try:
             print("Company check-in system ready. Please scan card.")
             while True:
+                self.display.show_waiting_screen(self.company_id)
                 status, TagType = self.reader.MFRC522_Request(self.reader.PICC_REQIDL)
                 if status == self.reader.MI_OK:
                     status, uid = self.reader.MFRC522_Anticoll()

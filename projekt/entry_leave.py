@@ -14,7 +14,6 @@ class ParkingSystem:
         return connect_to_database()
 
     def is_first_time_entry(self, conn, card_id):
-        """Check if this is the first time we've seen this card"""
         cursor = conn.cursor()
         try:
             cursor.execute("""
@@ -118,25 +117,33 @@ class ParkingSystem:
     def first_entry_handler(self, conn, card_id, data):
         print(f"Welcome! First time seeing vehicle with tag: {card_id}")
         print(f"Entry time: {data['entry_time'].strftime('%H:%M:%S')}")
+        self.display.show_first_entry(data['entry_time'])
+        time.sleep(2)  
 
     def entry_handler(self, conn, card_id, data):
         print(f"Welcome back! Vehicle entered: {card_id}")
         print(f"Entry time: {data['entry_time'].strftime('%H:%M:%S')}")
+        self.display.show_entry(data['entry_time'])
+        time.sleep(2) 
 
     def exit_handler(self, conn, card_id, data):
         print(f"Goodbye! Vehicle exited: {card_id}")
         print(f"Entry time: {data['entry_time'].strftime('%H:%M:%S')}")
         print(f"Exit time: {data['exit_time'].strftime('%H:%M:%S')}")
-        duration_str = str(data['exit_time'] - data['entry_time']).split('.')[0] 
+        duration_str = str(data['exit_time'] - data['entry_time']).split('.')[0]
         print(f"Duration: {duration_str}")
         if data['bonus_hours'] > 0:
             print(f"Company bonus hours used: {data['bonus_hours']}")
         print(f"Total price: {data['total_price']:.2f} PLN")
+        
+        self.display.show_exit(data)
+        time.sleep(2)
 
     def run(self):
             try:
                 print("System ready. Please scan card.")
                 while True:
+                    self.display.show_waiting_screen()
                     status, TagType = self.reader.MFRC522_Request(self.reader.PICC_REQIDL)
                     if status == self.reader.MI_OK:
                         status, uid = self.reader.MFRC522_Anticoll()
